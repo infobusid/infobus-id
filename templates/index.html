@@ -1,59 +1,362 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="id">
 <head>
-    <title>Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        
-        form {
-            width: 300px;
-            margin: 50px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
-        
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            height: 40px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        
-        input[type="submit"] {
-            width: 100%;
-            height: 40px;
-            background-color: #4CAF50;
-            color: #fff;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        input[type="submit"]:hover {
-            background-color: #3e8e41;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jadwal & Tarif Bus — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#eaf6ff; /* very light blue */
+      --card:#ffffff;
+      --accent:#5fc0ff; /* light cyan-blue */
+      --accent-2:#2b9cff; /* stronger blue */
+      --muted:#6b7280;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 6px 18px rgba(43,156,255,0.12);
+      --radius:14px;
+      --maxw:1100px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,var(--bg),#f7fbff);
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px 18px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+
+    .container{
+      width:100%;
+      max-width:var(--maxw);
+      margin:0 auto;
+    }
+
+    header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .logo{
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:white;
+      width:64px;height:64px;border-radius:14px;
+      display:grid;place-items:center;font-weight:700;font-size:20px;box-shadow:var(--shadow);
+    }
+
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted)}
+
+    .layout{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    /* left panel (form + filters) */
+    .panel{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      position:sticky;top:20px;
+    }
+
+    label{display:block;font-size:13px;margin-top:10px;color:var(--muted)}
+    input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef9;background:linear-gradient(180deg,rgba(250,253,255,0.9),white);outline:none}
+    .row{display:flex;gap:10px}
+    .row .col{flex:1}
+
+    .btn{
+      display:inline-flex;gap:8px;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:600
+    }
+    .btn-add{background:linear-gradient(90deg,var(--accent-2),var(--accent));color:white;box-shadow:0 8px 20px rgba(43,156,255,0.12)}
+    .btn-clear{background:transparent;color:var(--accent-2);border:1px solid rgba(43,156,255,0.12)}
+
+    /* right panel (list) */
+    .list-card{background:transparent}
+    .controls{
+      display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px;
+    }
+
+    .search{flex:1;margin-right:12px}
+    .select{width:180px}
+
+    .cards{
+      display:grid;gap:14px;
+    }
+
+    .bus-card{
+      background:var(--card);
+      border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);
+    }
+
+    .bus-meta{flex:1}
+    .bus-title{display:flex;gap:10px;align-items:center}
+    .bus-title h3{margin:0;font-size:18px}
+    .pill{font-size:12px;padding:6px 8px;border-radius:999px;background:var(--glass);display:inline-flex;align-items:center;gap:8px;color:var(--muted)}
+
+    .route{display:flex;gap:10px;align-items:center;color:var(--muted);margin-top:8px}
+    .route strong{color:var(--accent-2)}
+
+    .right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .price{font-weight:700;font-size:18px;color:var(--accent-2)}
+    .time{color:var(--muted)}
+
+    /* small screens */
+    @media (max-width:880px){
+      .layout{grid-template-columns:1fr;}
+      .panel{position:relative}
+      header{flex-direction:row}
+    }
+
+    /* tiny ui tweaks */
+    .muted{color:var(--muted);font-size:13px}
+    .toggle{display:flex;gap:8px}
+    .chip{padding:8px 10px;border-radius:999px;border:1px solid rgba(11,35,84,0.04);background:linear-gradient(180deg,rgba(255,255,255,0.6),white);cursor:pointer}
+
+    footer{margin-top:18px;font-size:13px;color:var(--muted)}
+
+  </style>
 </head>
 <body>
-    <form method="POST" action="/login">
-        <h2>Login</h2>
-        <label>Username:</label>
-        <input type="text" name="username" placeholder="Masukkan username" required>
-        <label>Password:</label>
-        <input type="password" name="password" placeholder="Masukkan password" required autocomplete="off">
-        <input type="submit" value="Login">
-    </form>
+  <div class="container">
+    <header>
+      <div class="logo">BUS</div>
+      <div>
+        <h1>Daftar Jadwal & Tarif Bus</h1>
+        <p class="lead">Tampilan modern, responsif — tema biru muda. Tambah, filter, dan urutkan jadwal bus.</p>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="panel" aria-label="Form input jadwal">
+        <h3>Tambah Jadwal Baru</h3>
+        <p class="muted">Isi detail bus lalu klik Tambah.</p>
+
+        <label for="busName">Nama Bus</label>
+        <input id="busName" placeholder="Contoh: Sinar Jaya" />
+
+        <div class="row">
+          <div class="col">
+            <label for="from">Terminal Berangkat</label>
+            <input id="from" placeholder="Terminal Pulogadung" />
+          </div>
+          <div class="col">
+            <label for="to">Terminal Tujuan</label>
+            <input id="to" placeholder="Terminal Blok M" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="time">Jam Berangkat</label>
+            <input id="time" type="time" />
+          </div>
+          <div class="col">
+            <label for="class">Kelas</label>
+            <select id="class">
+              <option value="Ekonomi">Ekonomi</option>
+              <option value="Non-Ekonomi">Non-Ekonomi</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="price">Tarif (IDR)</label>
+        <input id="price" type="number" placeholder="200000" />
+
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-add" id="addBtn">➕ Tambah</button>
+          <button class="btn btn-clear" id="clearBtn">Bersihkan</button>
+        </div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #eef8ff" />
+
+        <h4>Filter Cepat</h4>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="chip" data-filter="all">Semua</button>
+          <button class="chip" data-filter="Ekonomi">Ekonomi</button>
+          <button class="chip" data-filter="Non-Ekonomi">Non-Ekonomi</button>
+        </div>
+
+        <footer>
+          <p>Desain: Tema biru muda — responsif.</p>
+        </footer>
+      </aside>
+
+      <section>
+        <div class="list-card">
+          <div class="controls">
+            <input class="search" id="search" placeholder="Cari nama bus, terminal, atau tarif..." />
+            <select id="sort" class="select">
+              <option value="time_asc">Urutkan: Jam (terdekat)</option>
+              <option value="time_desc">Jam (terjauh)</option>
+              <option value="price_asc">Tarif (murah → mahal)</option>
+              <option value="price_desc">Tarif (mahal → murah)</option>
+            </select>
+          </div>
+
+          <div class="cards" id="cards"></div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Sample initial data
+    const data = [
+      {id:1,name:'Sinar Jaya',from:'Terminal Pulogadung',to:'Terminal Blok M',time:'06:30',class:'Ekonomi',price:125000},
+      {id:2,name:'Lorena Trans',from:'Terminal Kampung Rambutan',to:'Terminal Bekasi',time:'09:15',class:'Non-Ekonomi',price:180000},
+      {id:3,name:'Putra Pelangi',from:'Terminal Grogol',to:'Terminal Merak',time:'13:00',class:'Ekonomi',price:95000}
+    ];
+
+    // Utilities
+    const money = v => {
+      // format as IDR
+      return v.toLocaleString('id-ID', {style:'currency',currency:'IDR',maximumFractionDigits:0});
+    }
+
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    // Render
+    function render(list){
+      const wrap = $('#cards');
+      wrap.innerHTML = '';
+      if(list.length===0){
+        wrap.innerHTML = '<div class="muted">Tidak ada jadwal yang ditemukan.</div>';
+        return;
+      }
+      list.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'bus-card';
+        el.innerHTML = `
+          <div style="width:64px;height:64px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(95,192,255,0.12),rgba(43,156,255,0.06));font-weight:700;color:var(--accent-2)">
+            ${item.name.split(' ').map(s=>s[0]).slice(0,2).join('')}
+          </div>
+          <div class="bus-meta">
+            <div class="bus-title"><h3>${item.name}</h3><span class="pill">${item.class}</span></div>
+            <div class="route"><div><strong>${item.from}</strong> → ${item.to}</div><div style="margin-left:12px;color:var(--muted)">ID: ${item.id}</div></div>
+          </div>
+          <div class="right">
+            <div class="price">${money(item.price)}</div>
+            <div class="time">Berangkat: ${item.time}</div>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button class="chip" onclick="editItem(${item.id})">Edit</button>
+              <button class="chip" onclick="deleteItem(${item.id})">Hapus</button>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(el);
+      });
+    }
+
+    // CRUD actions
+    function addItem(){
+      const name = $('#busName').value.trim();
+      const from = $('#from').value.trim();
+      const to = $('#to').value.trim();
+      const time = $('#time').value;
+      const cls = $('#class').value;
+      const price = Number($('#price').value);
+      if(!name || !from || !to || !time || !price){
+        alert('Harap isi semua field (nama, terminal, jam, tarif).');
+        return;
+      }
+      const id = Date.now();
+      data.push({id,name,from,to,time,class:cls,price});
+      clearForm();
+      applyFilters();
+    }
+
+    function clearForm(){
+      $('#busName').value='';$('#from').value='';$('#to').value='';$('#time').value='';$('#price').value='';$('#class').value='Ekonomi'
+    }
+
+    function deleteItem(id){
+      if(!confirm('Hapus jadwal ini?')) return;
+      const idx = data.findIndex(x=>x.id===id);
+      if(idx>=0) data.splice(idx,1);
+      applyFilters();
+    }
+
+    function editItem(id){
+      const item = data.find(x=>x.id===id);
+      if(!item) return;
+      // populate form for editing (simple replace on add)
+      if(!confirm('Isi form akan diisi dengan data ini untuk diedit. Setelah mengubah, klik Tambah untuk menyimpan perubahan (akan membuat entri baru). Gunakan Hapus untuk menghapus duplikat jika perlu).')) return;
+      $('#busName').value = item.name;
+      $('#from').value = item.from;
+      $('#to').value = item.to;
+      $('#time').value = item.time;
+      $('#class').value = item.class;
+      $('#price').value = item.price;
+    }
+
+    // Filtering & sorting
+    function applyFilters(){
+      const q = $('#search').value.trim().toLowerCase();
+      const sort = $('#sort').value;
+      let list = data.slice();
+      // search
+      if(q){
+        list = list.filter(i=> (i.name||'').toLowerCase().includes(q) || (i.from||'').toLowerCase().includes(q) || (i.to||'').toLowerCase().includes(q) || String(i.price).includes(q));
+      }
+      // class-chip filter
+      const activeFilter = document.querySelector('.chip.active');
+      if(activeFilter){
+        const f = activeFilter.dataset.filter;
+        if(f !== 'all') list = list.filter(i=>i.class===f);
+      }
+
+      // sort
+      if(sort==='time_asc'){
+        list.sort((a,b)=> a.time.localeCompare(b.time));
+      }else if(sort==='time_desc'){
+        list.sort((a,b)=> b.time.localeCompare(a.time));
+      }else if(sort==='price_asc'){
+        list.sort((a,b)=> a.price-b.price);
+      }else if(sort==='price_desc'){
+        list.sort((a,b)=> b.price-a.price);
+      }
+
+      render(list);
+    }
+
+    // events
+    document.getElementById('addBtn').addEventListener('click',addItem);
+    document.getElementById('clearBtn').addEventListener('click',clearForm);
+    document.getElementById('search').addEventListener('input',applyFilters);
+    document.getElementById('sort').addEventListener('change',applyFilters);
+    document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',function(){
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      this.classList.add('active');
+      applyFilters();
+    }));
+
+    // initialize - set "Semua" as active
+    document.querySelector('.chip[data-filter="all"]').classList.add('active');
+    applyFilters();
+
+    // small enhancement: allow Enter to add when in form
+    ['busName','from','to','price'].forEach(id=>{
+      const el = document.getElementById(id);
+      el && el.addEventListener('keydown', e=>{ if(e.key==='Enter') addItem(); });
+    });
+
+  </script>
 </body>
 </html>
